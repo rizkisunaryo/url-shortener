@@ -1,0 +1,60 @@
+<html>
+<head>
+	<title>Mindvalley - URL Shortener</title>
+	<style type="text/css">
+	.inpTxtErr {
+		border:2px solid #f00;
+	}
+	</style>
+</head>
+<body>
+	<input id="longUrlInp" type="text" name="longUrl" placeholder="Long URL" size="60" />
+	<button id="longUrlSubmit">submit</button>
+	<div style="margin-top:10px;">Shortened URL: <span id="shortenedUrl"></span></div>
+
+	<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+	<script type="text/javascript">
+	$(function() { 
+		$('#longUrlInp').keypress(function(e) {
+	    if(e.which == 13) {
+        submitLongUrl('#longUrlInp','inpTxtErr','#shortenedUrl');
+	    }
+		});
+		$("#longUrlSubmit").click(function() {
+		  submitLongUrl('#longUrlInp','inpTxtErr','#shortenedUrl');
+		});
+	});
+
+	function submitLongUrl(pSelector,pErrClass,pResultSelector){
+		var selector = $(pSelector);
+		var vLongUrl = selector.val();
+		if (vLongUrl=='') {
+			selector.addClass(pErrClass);
+		}
+		else {
+			selector.removeClass(pErrClass);
+			showShortenedUrl(vLongUrl,pResultSelector);
+		}
+	}
+
+	function showShortenedUrl(pLongUrl,pResultSelector) {
+		var reqData = {
+			longUrl: pLongUrl
+		}
+		$.ajax({
+      url: 'api.php',
+      type: 'POST',
+      dataType: 'json',
+      success: function(data) {
+      	var html='<a href="'+data.id+'" target="_blank" style="target-new:tab;">'+data.id+'</a>';
+        $(pResultSelector).html(html);
+      }.bind(this),
+      error: function(xhr, status, err) {
+        $(pResultSelector).html('');
+      }.bind(this),
+      data: JSON.stringify(reqData)
+    });
+	}
+	</script>
+</body>
+</html>
